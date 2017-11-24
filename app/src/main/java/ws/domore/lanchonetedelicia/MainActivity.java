@@ -1,8 +1,11 @@
 package ws.domore.lanchonetedelicia;
 
+import com.loopj.android.http. *;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -11,6 +14,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+
+import cz.msebera.android.httpclient.Header;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -22,29 +27,29 @@ public class MainActivity extends AppCompatActivity {
         TextView textView = (TextView)this.findViewById(R.id.text_view_title);
         textView.setText(R.string.products_title);
 
-        ArrayList<String> produto_list = new ArrayList<String>();
+        final ArrayList<String> produtoList = new ArrayList<String>();
 
-        produto_list.add("Suco Onda Tropical");
-        produto_list.add("Vitamina Planetaria");
-        produto_list.add("Hamburguer Exagerado");
-        produto_list.add("Pastel Super");
-        produto_list.add("Empada Olho Grande");
-        produto_list.add("Boliviado Quente");
-        produto_list.add("Quibe POP");
-        produto_list.add("Esfirra do Sabor");
-        produto_list.add("Crepioca Saborosa");
-        produto_list.add("Pao de Nuvem");
-        produto_list.add("Bruschetta Integral");
-        produto_list.add("Banana chips");
-        produto_list.add("Sopa Funcional");
-        produto_list.add("Sanduche Natureba");
-        produto_list.add("Salada  Surpresa");
+        produtoList.add("Suco Onda Tropical");
+        produtoList.add("Vitamina Planetaria");
+        produtoList.add("Hamburguer Exagerado");
+        produtoList.add("Pastel Super");
+        produtoList.add("Empada Olho Grande");
+        produtoList.add("Boliviado Quente");
+        produtoList.add("Quibe POP");
+        produtoList.add("Esfirra do Sabor");
+        produtoList.add("Crepioca Saborosa");
+        produtoList.add("Pao de Nuvem");
+        produtoList.add("Bruschetta Integral");
+        produtoList.add("Banana chips");
+        produtoList.add("Sopa Funcional");
+        produtoList.add("Sanduche Natureba");
+        produtoList.add("Salada  Surpresa");
 
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(
                 this,
                 R.layout.list_item_produto,
                 R.id.text_view_produto,
-                produto_list
+                produtoList
         );
 
         ListView listView = (ListView)this.findViewById(R.id.list_view_produtos);
@@ -60,9 +65,25 @@ public class MainActivity extends AppCompatActivity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Toast newToast = Toast.makeText(MainActivity.this, ""+i, Toast.LENGTH_SHORT);
-                newToast.show();
+                Intent detalheActivity = new Intent(MainActivity.this,DetalheActivity.class);
+                detalheActivity.putExtra("produto_nome",produtoList.get(i));
+                startActivity(detalheActivity);
             }
         });
+        AsyncHttpClient client = new AsyncHttpClient();
+        client.get("https://patra-backend.appspot.com/produtos",
+                new TextHttpResponseHandler() {
+                    @Override
+                    public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                        Log.d("AsyncHttpClient", "onFailure response = " + responseString);
+                        Log.d("AsyncHttpClient",throwable.toString());
+                    }
+
+                    @Override
+                    public void onSuccess(int statusCode, Header[] headers, String responseString) {
+                            Log.d("AsyncHttpClient", "onSuccess response = " + responseString);
+                        }
+                });
+
     }
 }
